@@ -1,12 +1,23 @@
-const fs = require('fs');
+const express = require("express");
+const app = express();
+const morgan = require("morgan");
 
-const fileName = "target.txt";
+const port = 8080;
 
-const errorHandler = err => console.error(err);
+const { getPosts } = require("./routes/post");
 
-const dataHandler = data => console.log('Data from file: ', data.toString());
+// middleware
+app.use(morgan("dev"));
 
-fs.readFile(fileName, (err, data) => {
-    if (err) errorHandler(err)
-    dataHandler(data);
-});
+// custom middleware
+const customMiddleWare = () => {
+  console.log("custom middleware applied!");
+};
+
+app.use(customMiddleWare);
+
+app.get("/", getPosts);
+
+app.listen(port, () =>
+  console.log(`Node JS API is listening on port: ${port}`)
+);
