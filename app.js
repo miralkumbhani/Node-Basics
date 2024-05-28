@@ -1,22 +1,25 @@
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
+const dotenv = require("dotenv");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
 
-const port = 8080;
+dotenv.config();
 
-const { getPosts } = require("./routes/post");
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("DB Connected"))
+  .catch((error) => console.error("DB Connection error: ", error));
+
+const port = process.env.PORT || 8080;
+
+const postRoutes = require("./routes/post");
 
 // middleware
 app.use(morgan("dev"));
-
-// custom middleware
-const customMiddleWare = () => {
-  console.log("custom middleware applied!");
-};
-
-app.use(customMiddleWare);
-
-app.get("/", getPosts);
+app.use(bodyParser.json());
+app.use("/", postRoutes);
 
 app.listen(port, () =>
   console.log(`Node JS API is listening on port: ${port}`)
